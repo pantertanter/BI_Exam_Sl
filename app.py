@@ -80,17 +80,26 @@ st.markdown('---')
 
 # ------------------------------------------Creating a heatmap  -------------------------------------------
 
-st.markdown('## Correlation Heatmap')
+st.markdown('## Correlation Heatmap With All Features')
 correlation_heatmap_fig = create_correlation_heatmap(data)
 st.pyplot(correlation_heatmap_fig)
 
-#------------------------------------------------Cleaning out features------------------------------------------------
+#------------------------------------------------Cleaning out features------------------------------------
 
 features_to_remove = ['Unemployment', 'Holiday_Flag']
 
 cleaned_data = clean_out_features(data, features_to_remove)
 
-st.markdown("## Data Preprocessing Summary")
+#------------------------------------------------Creating a heatmap with cleaned out features-------------
+
+st.markdown('## Correlation Heatmap With Cleaned Out Features')
+correlation_heatmap_fig_cleaned = create_correlation_heatmap(cleaned_data)
+st.pyplot(correlation_heatmap_fig_cleaned)
+
+#------------------------------------------------Cleaning out features------------------------------------
+
+#------------------------------------------------Sample plus row select-----------------------------------
+
 
 # Explain the data preprocessing steps
 # st.write("We removed the features which has the least impact on Weekly Sales and decided not to inspect them further for now.")

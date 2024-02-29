@@ -124,28 +124,6 @@ def create_box_plot(data):
     ax.set_ylabel(selected_column)
     return fig
 
-# ------------------------------------------------Weekly Sales by Stores------------------------------------------------
-
-def visualize_sales_histogram(data, save_path='sales_histogram.png'):
-    # Convert 'Date' column to datetime type
-    data['Date'] = pd.to_datetime(data['Date'])
-    
-    # Group data by 3-month intervals and sum weekly sales
-    grouped_data = data.resample('3M', on='Date')['Weekly_Sales'].sum()
-    
-    # Plot the histogram
-    plt.bar(grouped_data.index.astype(str), grouped_data.values)
-    
-    plt.title('Distribution of Weekly Sales Over Time (3-Month Intervals)')
-    plt.xlabel('Time Interval')
-    plt.ylabel('Total Weekly Sales')
-    plt.xticks(rotation=45)
-    plt.grid(axis='y')
-    
-    plt.tight_layout()
-    plt.savefig(save_path)
-    plt.close()
-
 # ------------------------------------------------Correlation Heatmap------------------------------------------------
     
 def create_correlation_heatmap(data):
