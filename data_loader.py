@@ -1,16 +1,18 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import shapiro
-import os
 from scipy.stats import anderson, norm
 import numpy as np
 import seaborn as sns
+
+# ------------------------------------------------Loading the data------------------------------------------------
 
 
 # Read the CSV file into a DataFrame
 def read_csv(file_path):
     return pd.read_csv(file_path)
+
+# ------------------------------------------------Cleaning the data------------------------------------------------
 
 # Clean the DataFrame
 def clean_data(data):
@@ -40,6 +42,7 @@ def clean_data(data):
     
     return data_cleaned
 
+# ------------------------------------------------Clean out features------------------------------------------------
 
 def clean_out_features(data, features):
     # Check if the features exist in the DataFrame before dropping them
@@ -49,30 +52,7 @@ def clean_out_features(data, features):
     data_cleaned = data.drop(existing_features, axis=1)
     return data_cleaned
 
-def create_and_save_box_plot(data):
-    # Generate a unique key for the selectbox
-    selectbox_key = "select_column_box_plot"
-    
-    # Create a dropdown menu for column selection
-    selected_column = st.selectbox("Select a column:", data.columns, key=selectbox_key)
-    
-    # Create the box plot based on the selected column
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.boxplot(data[selected_column])
-    ax.set_title(f'Box Plot of {selected_column}')
-    ax.set_ylabel(selected_column)
-    return fig
-
-def create_box_plot_no_outliers(data, column='Weekly_Sales', show_outliers=False):
-    plt.figure(figsize=(8, 6))
-    plt.boxplot(data[column], showfliers=show_outliers)
-    plt.title(f'Box Plot of {column}')
-    plt.ylabel(column)
-
-    # Return the figure
-    return plt.gcf()
-
-
+# ------------------------------------------------Normality test------------------------------------------------
 
 def normal_test(data):
     if data.empty:
@@ -98,6 +78,8 @@ def normal_test(data):
         else:
             results.append(f"Data in column '{column}' is not normally distributed (p = {p_value:.4f})")
     return results
+
+# ------------------------------------------------Visualizing the normal distribution interactive------------------------------------------------
 
 def plot_normal_distribution(data, column_name):
     # Extract the column data
@@ -126,6 +108,24 @@ def plot_normal_distribution(data, column_name):
     # Display the figure in Streamlit
     st.pyplot(fig)
 
+# ------------------------------------------------Creating an interactive box plot------------------------------------------------
+
+def create_box_plot(data):
+    # Generate a unique key for the selectbox
+    selectbox_key = "select_column_box_plot"
+    
+    # Create a dropdown menu for column selection
+    selected_column = st.selectbox("Select a column:", data.columns, key=selectbox_key)
+    
+    # Create the box plot based on the selected column
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.boxplot(data[selected_column])
+    ax.set_title(f'Box Plot of {selected_column}')
+    ax.set_ylabel(selected_column)
+    return fig
+
+# ------------------------------------------------Weekly Sales by Stores------------------------------------------------
+
 def visualize_sales_histogram(data, save_path='sales_histogram.png'):
     # Convert 'Date' column to datetime type
     data['Date'] = pd.to_datetime(data['Date'])
@@ -145,6 +145,8 @@ def visualize_sales_histogram(data, save_path='sales_histogram.png'):
     plt.tight_layout()
     plt.savefig(save_path)
     plt.close()
+
+# ------------------------------------------------Correlation Heatmap------------------------------------------------
     
 def create_correlation_heatmap(data):
     # Calculate correlation matrix
@@ -155,21 +157,5 @@ def create_correlation_heatmap(data):
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
 
     # Return the heatmap plot
-    return plt.gcf()
-
-import os
-
-def create_sales_by_stores_plot(data):
-    # Create the bar plot
-    plt.figure(figsize=(15, 5))
-    sns.barplot(x='Store', y='Weekly_Sales', color='#FFC220', data=data)
-
-    plt.xlabel('Store Number')
-    plt.ylabel('Weekly Sales')
-    plt.title('Weekly Sales by Stores')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    # Return the plot
     return plt.gcf()
 
