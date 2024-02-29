@@ -1,13 +1,14 @@
 import streamlit as st
-from data_loader import (read_csv, normal_test,
+from data_loader import (read_csv, normal_test, clean_data,
                          create_and_save_box_plot, create_correlation_heatmap,
-                         create_sales_by_stores_plot, create_box_plot_no_outliers)
+                         create_sales_by_stores_plot, create_box_plot_no_outliers,
+                         clean_out_features, plot_normal_distribution)
 import pandas as pd
 
 # Read the CSV file
 data = read_csv('data/Walmart.csv')
 
-data['Date'] = pd.to_datetime(data['Date'], format='%d-%m-%Y')
+data = clean_data(data)
 
 # Display a sample of the data
 st.write('Sample of the data:')
@@ -47,9 +48,20 @@ normal_test_result = normal_test(data)
 for result in normal_test_result:
     st.write(result)
 
-st.markdown('## Correlation Heatmap')
-correlation_heatmap_fig = create_correlation_heatmap(data)
-st.pyplot(correlation_heatmap_fig)
+st.write('The normality test suggests that non of the columns is normally distributed.')
+st.write('We personally do not trust this so we will make a visual representation of the normal distribution.')
+st.write('We will visualize the normal distribution of the columns to confirm the result.')
+
+# Optional column selection 
+st.title("Normal Distribution Visualization")
+
+# Selectbox for choosing the column
+selected_column = st.selectbox("Select a column:", data.columns)
+
+# Plot the normal distribution if a column is selected
+if selected_column:
+    st.write(f"### {selected_column}")
+    plot_normal_distribution(data, selected_column)
 
 st.markdown('## Weekly Sales by Stores')
 sales_by_stores_plot_fig = create_sales_by_stores_plot(data)
@@ -57,6 +69,7 @@ st.pyplot(sales_by_stores_plot_fig)
 
 st.markdown('---')
 st.markdown('## Box Plot of Weekly Sales With Outliers')
+st.markdown('The box plot below shows the distribution of the Weekly Sales with outliers and we can se that all the outliers are beond the max.')
 box_plot_fig = create_and_save_box_plot(data)
 st.pyplot(box_plot_fig)
 st.markdown('---')
@@ -67,24 +80,22 @@ box_plot_fig = create_box_plot_no_outliers(data)
 st.pyplot(box_plot_fig)
 st.markdown('---')
 
-# Header
-st.header('This is a header')
+st.markdown('## Correlation Heatmap')
+correlation_heatmap_fig = create_correlation_heatmap(data)
+st.pyplot(correlation_heatmap_fig)
 
-# Subheader
-st.subheader('This is a subheader')
+features_to_remove = ['Unemployment', 'Holiday_Flag']
 
-# Text
-st.write('This is some text.')
+cleaned_data = clean_out_features(data, features_to_remove)
 
-# Displaying Data
-st.write('Here is some data:')
-st.write(pd.DataFrame({
-    'Name': ['Alice', 'Bob', 'Charlie'],
-    'Age': [25, 30, 35]
-}))
+st.markdown("## Data Preprocessing Summary")
 
-# Interactive Widgets
-number = st.number_input('Enter a number')
-st.write('The square of the number is:', number ** 2)
+# Explain the data preprocessing steps
+st.write("We removed the features which has the least impact on Weekly Sales and decided not to inspect them further for now.")
+st.write("As a result, the data is now represented by the following sample with 6 rows.")
 
-st.write(data.sample(n=5))
+# Display the sample data frame
+st.write(cleaned_data.sample(n=6))
+
+# Indicate the number of columns remaining
+st.write("The data frame now has 6 columns left.")

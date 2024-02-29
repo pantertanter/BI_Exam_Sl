@@ -1,8 +1,9 @@
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import shapiro
 import os
-from scipy.stats import anderson
+from scipy.stats import anderson, norm
 import numpy as np
 import seaborn as sns
 
@@ -48,18 +49,19 @@ def clean_out_features(data, features):
     data_cleaned = data.drop(existing_features, axis=1)
     return data_cleaned
 
+def create_and_save_box_plot(data):
+    # Generate a unique key for the selectbox
+    selectbox_key = "select_column_box_plot"
     
-import matplotlib.pyplot as plt
-
-def create_and_save_box_plot(data, column='Weekly_Sales'):
+    # Create a dropdown menu for column selection
+    selected_column = st.selectbox("Select a column:", data.columns, key=selectbox_key)
+    
+    # Create the box plot based on the selected column
     fig, ax = plt.subplots(figsize=(8, 6))
-    ax.boxplot(data[column])
-    ax.set_title(f'Box Plot of {column}')
-    ax.set_ylabel(column)
+    ax.boxplot(data[selected_column])
+    ax.set_title(f'Box Plot of {selected_column}')
+    ax.set_ylabel(selected_column)
     return fig
-
-
-import matplotlib.pyplot as plt
 
 def create_box_plot_no_outliers(data, column='Weekly_Sales', show_outliers=False):
     plt.figure(figsize=(8, 6))
@@ -70,9 +72,7 @@ def create_box_plot_no_outliers(data, column='Weekly_Sales', show_outliers=False
     # Return the figure
     return plt.gcf()
 
-from scipy.stats import kstest
 
-from scipy.stats import shapiro
 
 def normal_test(data):
     if data.empty:
@@ -92,12 +92,39 @@ def normal_test(data):
         result = anderson(numeric_data[column].dropna())
         statistic = result.statistic
         critical_values = result.critical_values
-        p_value = result.significance_level / 100
+        p_value = result.significance_level[0]  # Extracting the p-value
         if all(statistic < critical_values):
-            results.append(f"Data in column '{column}' is normally distributed (p = {p_value[0]:.4f})")
+            results.append(f"Data in column '{column}' is normally distributed (p = {p_value:.4f})")
         else:
-            results.append(f"Data in column '{column}' is not normally distributed (p = {p_value[0]:.4f})")
+            results.append(f"Data in column '{column}' is not normally distributed (p = {p_value:.4f})")
     return results
+
+def plot_normal_distribution(data, column_name):
+    # Extract the column data
+    column_data = data[column_name].dropna()
+    
+    # Fit a normal distribution to the data
+    mu, std = norm.fit(column_data)
+
+    # Create a new figure
+    fig, ax = plt.subplots()
+
+    # Plot the histogram of the data
+    ax.hist(column_data, bins=30, density=True, alpha=0.6, color='g')
+
+    # Plot the PDF (Probability Density Function) of the fitted normal distribution
+    xmin, xmax = ax.get_xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = norm.pdf(x, mu, std)
+    ax.plot(x, p, 'k', linewidth=2)
+
+    ax.set_title(f"Histogram and Normal Distribution Fit for {column_name}")
+    ax.set_xlabel(column_name)
+    ax.set_ylabel("Frequency")
+    ax.grid(True)
+
+    # Display the figure in Streamlit
+    st.pyplot(fig)
 
 def visualize_sales_histogram(data, save_path='sales_histogram.png'):
     # Convert 'Date' column to datetime type
