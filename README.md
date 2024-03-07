@@ -30,7 +30,7 @@ The development workflow is divided into four sprints and milestones, each with 
 2. Clean and integrate the collected data, applying necessary transformations (ETL or ELT).
 - We have checked for null values, used normalization and visualization to figure out which features to proceed with.
 3. Explore and analyze the data using descriptive statistics and visualization techniques.
-- Box-plot, histogram, with or without outliers and with quartiles, min and max, as well as describe and correlation heatmap.
+- Box-plot and histogram with normal distribution indicators, quartiles, min and max, as well as describe and correlation heatmap.
 4. Prepare the data for further analysis, ensuring its quality, sufficiency, structure, cleanliness, scalability, and informativeness.
 - We have picked out some key figures to work onwards with, but it is hard as the features of our data set does not correlate much.
 
