@@ -14,10 +14,6 @@ import matplotlib.pyplot as plt
 
 data = read_csv('data/Walmart.csv')
 
-#------------------------------------------------Cleaning the data------------------------------------------------
-
-data = clean_data(data)
-
 #------------------------------------------------Sample plus row select-------------------------------------------
 
 # Display a sample of the data
@@ -42,6 +38,10 @@ if st.button('Submit'):
         st.write(selected_row)
     else:
         st.write(f"Row number must be between 1 and {len(data)}.")
+
+#------------------------------------------------Cleaning the data------------------------------------------------
+
+data = clean_data(data)
 
 # ------------------------------------------------Describe------------------------------------------------
 
