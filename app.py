@@ -4,7 +4,8 @@ from data_loader import (read_csv, normal_test, clean_data,
                         clean_out_features, plot_normal_distribution,
                         apply_kmeans_clustering, calculate_wcss,
                         plot_elbow, calculate_silhouette_scores,
-                        train_random_forest_regression_with_metrics, visualize_random_forest_regression)
+                        train_random_forest_regression_with_metrics, visualize_random_forest_regression,
+                        train_gradient_boosting_regression)
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
@@ -165,8 +166,43 @@ st.write('**The numeric features are scaled using StandardScaler to ensure that 
 fig = apply_kmeans_clustering(data, sample_size=1000, num_clusters=2, random_state=42)
 st.pyplot(fig)
 
+# ------------------------------------------------train gradient boosting regression----------------------------------------
 
+st.title('Training Gradient Boosting And Random Forrest Regression Models')
 
+# Train the model and get evaluation metrics, actual values, and predicted values
+evaluation_metrics, actual_values, predicted_values = train_gradient_boosting_regression(data, target_column='Weekly_Sales')
+
+st.write('**The gradient boosting regression model has been trained and evaluated.**')
+
+# Plot the actual vs. predicted values
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.scatter(actual_values, predicted_values, color='blue', alpha=0.5)
+ax.plot([min(actual_values), max(actual_values)], [min(actual_values), max(actual_values)], color='red', linestyle='--')
+ax.set_xlabel('Actual Values')
+ax.set_ylabel('Predicted Values')
+ax.set_title('Actual vs. Predicted Values')
+ax.grid(True)
+
+# Display the plot in the Streamlit app
+st.pyplot(fig)
+
+# Display the evaluation metrics
+st.write("Evaluation Metrics:")
+for metric, value in evaluation_metrics.items():
+    if metric == "Mean Absolute Error":
+        st.write(f"{metric}: ${value:.4f}")
+        st.write("**The mean absolute error (MAE) is the average absolute difference between the predicted and actual values. It measures the average magnitude of errors in a set of predictions, without considering their direction.**")
+    elif metric == "Mean Squared Error":
+        st.write(f"{metric}: ${value:.4f}")
+        st.write("**The mean squared error (MSE) is the average of the squares of the errors between the predicted and actual values. It measures the average magnitude of the squared errors.**")
+    elif metric == "Root Mean Squared Error":
+        st.write(f"{metric}: ${value:.4f}")
+        st.write("**The root mean squared error (RMSE) is the square root of the mean squared error. It measures the average magnitude of the errors in a set of predictions, considering their direction.**")
+    elif metric == "R-squared":
+        st.write(f"{metric}: {value:.4f}")
+        st.write("**The R-squared value (R^2) is a measure of how well the model explains the variance in the target variable. It ranges from 0 to 1, with higher values indicating a better fit.**")
+        
 # ---------------------------Random forest regression and visualize actual vs predicted-----------------------------
     
 st.write("**This scatter plot compares what the model predicted with what actually happened. Each point on the plot represents one week of sales. The horizontal axis shows the actual sales that occurred, while the vertical axis shows the sales predicted by the model.**")
@@ -180,6 +216,8 @@ fig = visualize_random_forest_regression(data, target_column='Weekly_Sales')
 st.pyplot(fig)
 
 # ------------------------------------------------Random forest regression----------------------------------------
+
+
 
 evaluation_metrics = train_random_forest_regression_with_metrics(data, target_column='Weekly_Sales')
 st.write("Evaluation Metrics:")
@@ -199,4 +237,6 @@ for metric, value in evaluation_metrics.items():
 
 st.write("**The evaluation metrics help us understand how well the predictive model performs. If the MAE, MSE, and RMSE are close to 0, it indicates that the model's predictions are accurate. If R-squared is close to 1, it suggests that the model explains the variance in the target variable well.**")
 st.write("**Understanding we are dealing with significant figures for Wallmart Store sales for whole weeks this is an excellent result. Especially considering that the R-squared is so close to 1, making it a near perfect prediction.**")
+
+st.write('**Looking back over these two model, which performs very well by the looks of them and by looking at their metrics. The best performing model is fairly easy to spot and must be the random forrest regression prediction model and we would choose this if we only wanted to move forward with one model**')
 # ------------------------------------------------End of the app----------------------------------------

@@ -43,9 +43,11 @@ The development workflow is divided into four sprints and milestones, each with 
 1. Select relevant methods and algorithms for solving the problem.
 - We wanted to look further into clustering as we find this very interessting. It is especially interessting how feature values cluster together.
 2. Train predictive or generative data models using supervised and unsupervised methods, neural networks, LLMs, or graphs.
-- We have imiplementing and trained a random forrest regression method and showed a model which performs very well in predicting the weekly sales.
+- We have implemented and trained gradient boosting regression and random forrest regression method and showed a models which perform very well in predicting the weekly sales.
 3. Apply appropriate inference measures to assess model quality and test hypotheses.
+- We have printed the metrics of each model and eventhough one performs better then the other, they both perform very well both with R-squared above 0.9.
 4. Test, validate, and iterate models for improvement.
+- Our data set is plit into 20% for testing and 80% for training of the data. We have evaluated the performence by visual inspection and through metric for both of the models.
 
 **Recommended Deadline:** 11/03/24
 

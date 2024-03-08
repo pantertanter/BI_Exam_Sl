@@ -204,7 +204,7 @@ def apply_kmeans_clustering(data, num_clusters=2, sample_size=None, random_state
 # ------------------------------------------------random forest regression------------------------------------------------
 
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 def visualize_random_forest_regression(data, target_column, test_size=0.2, random_state=42):
@@ -248,6 +248,54 @@ def visualize_random_forest_regression(data, target_column, test_size=0.2, rando
 
     # Return the figure
     return fig
+
+# ------------------------------------------------gradient boosting regression------------------------------------------------
+
+def train_gradient_boosting_regression(data, target_column, test_size=0.2, random_state=42):
+    """
+    Train a Gradient Boosting Regression model on the given DataFrame and return evaluation metrics.
+
+    Parameters:
+    - data (DataFrame): The DataFrame containing features and target variable.
+    - target_column (str): The name of the target variable column.
+    - test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
+    - random_state (int, optional): Random state for reproducibility. Default is 42.
+
+    Returns:
+    - dict: A dictionary containing evaluation metrics.
+    - np.array: Array of actual values
+    - np.array: Array of predicted values
+    """
+
+    # Splitting the data into features (X) and target variable (y)
+    X = data.drop(columns=[target_column, 'Date'])
+    y = data[target_column]
+
+    # Splitting the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    # Initialize the Gradient Boosting Regression model
+    model = GradientBoostingRegressor(random_state=random_state)
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Make predictions on the test set
+    predictions = model.predict(X_test)
+
+    # Calculate evaluation metrics
+    mae = mean_absolute_error(y_test, predictions)
+    mse = mean_squared_error(y_test, predictions)
+    rmse = mean_squared_error(y_test, predictions, squared=False)
+    r2 = r2_score(y_test, predictions)
+
+    # Return evaluation metrics and actual vs. predicted values
+    return {
+        'Mean Absolute Error': mae,
+        'Mean Squared Error': mse,
+        'Root Mean Squared Error': rmse,
+        'R-squared': r2
+    }, y_test, predictions
 
 # ------------------------------------------------Random forest regression----------------------------------------
 
