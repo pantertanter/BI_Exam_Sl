@@ -32,7 +32,7 @@ The development workflow is divided into four sprints and milestones, each with 
 3. Explore and analyze the data using descriptive statistics and visualization techniques.
 - Box-plot and histogram with normal distribution indicators, quartiles, min and max, as well as describe and correlation heatmap.
 4. Prepare the data for further analysis, ensuring its quality, sufficiency, structure, cleanliness, scalability, and informativeness.
-- We have picked out some key figures to work onwards with, but it is hard as the features of our data set does not correlate much.
+- We have picked out some key figures to work onwards with.
 
 **Recommended Deadline:** 26/02/24
 
@@ -41,7 +41,9 @@ The development workflow is divided into four sprints and milestones, each with 
 **Objective:** Implement AI methods and algorithms for predictive modeling.
 
 1. Select relevant methods and algorithms for solving the problem.
+- We wanted to look further into clustering as we find this very interessting. It is especially interessting how feature values cluster together.
 2. Train predictive or generative data models using supervised and unsupervised methods, neural networks, LLMs, or graphs.
+- We have imiplementing and trained a random forrest regression method and showed a model which performs very well in predicting the weekly sales.
 3. Apply appropriate inference measures to assess model quality and test hypotheses.
 4. Test, validate, and iterate models for improvement.
 

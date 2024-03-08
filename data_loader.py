@@ -142,20 +142,9 @@ def create_correlation_heatmap(data):
     # Return the heatmap plot
     return plt.gcf()
 
-# ------------------------------------------------Silhouette Score------------------------------------------
 
-# Define calculate_silhouette_scores function
-def calculate_silhouette_scores(data, max_clusters=10):
-    numeric_data = data.select_dtypes(include=['number'])
-    silhouette_scores = []
-    for n_clusters in range(2, max_clusters + 1):
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        cluster_labels = kmeans.fit_predict(numeric_data)
-        silhouette_avg = silhouette_score(numeric_data, cluster_labels)
-        silhouette_scores.append(silhouette_avg)
-    return silhouette_scores
 
-# ------------------------------------------------Clustering------------------------------------------------
+# ------------------------------------------------Elbow Method------------------------------------------------
 
 # Define calculate_wcss and plot_elbow functions
 def calculate_wcss(data, max_clusters=10):
@@ -174,6 +163,21 @@ def plot_elbow(wcss, max_clusters=10):
     ax.set_xlabel('Number of Clusters')
     ax.set_ylabel('WCSS')
     return fig
+
+# ------------------------------------------------Silhouette Score------------------------------------------
+
+# Define calculate_silhouette_scores function
+def calculate_silhouette_scores(data, max_clusters=10):
+    numeric_data = data.select_dtypes(include=['number'])
+    silhouette_scores = []
+    for n_clusters in range(2, max_clusters + 1):
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+        cluster_labels = kmeans.fit_predict(numeric_data)
+        silhouette_avg = silhouette_score(numeric_data, cluster_labels)
+        silhouette_scores.append(silhouette_avg)
+    return silhouette_scores
+
+# ------------------------------------------------Clustering------------------------------------------------
 
 def apply_kmeans_clustering(data, num_clusters=2, sample_size=None, random_state=None):
     if sample_size:
