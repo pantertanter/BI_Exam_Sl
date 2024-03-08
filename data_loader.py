@@ -207,9 +207,53 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-def train_random_forest_regression(data, target_column, test_size=0.2, random_state=42):
+def visualize_random_forest_regression(data, target_column, test_size=0.2, random_state=42):
     """
-    Train a Random Forest Regression model on the given DataFrame.
+    Train a Random Forest Regression model on the given DataFrame and visualize the actual vs. predicted values.
+
+    Parameters:
+    - data (DataFrame): The DataFrame containing features and target variable.
+    - target_column (str): The name of the target variable column.
+    - test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
+    - random_state (int, optional): Random state for reproducibility. Default is 42.
+
+    Returns:
+    - fig: A matplotlib figure containing the scatter plot of actual vs. predicted values.
+    """
+
+    # Splitting the data into features (X) and target variable (y)
+    X = data.drop(columns=[target_column, 'Date'])
+    y = data[target_column]
+
+    # Splitting the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    # Initialize the Random Forest Regression model
+    model = RandomForestRegressor(n_estimators=100, random_state=random_state)
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Make predictions on the test set
+    predictions = model.predict(X_test)
+
+    # Visualize the actual vs. predicted values
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.scatter(y_test, predictions, color='blue', alpha=0.5)
+    ax.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
+    ax.set_xlabel('Actual Values')
+    ax.set_ylabel('Predicted Values')
+    ax.set_title('Actual vs. Predicted Values')
+    ax.grid(True)
+
+    # Return the figure
+    return fig
+
+# ------------------------------------------------Random forest regression----------------------------------------
+
+def train_random_forest_regression_with_metrics(data, target_column, test_size=0.2, random_state=42):
+    """
+    Train a Random Forest Regression model on the given DataFrame and return evaluation metrics.
 
     Parameters:
     - data (DataFrame): The DataFrame containing features and target variable.
@@ -229,7 +273,7 @@ def train_random_forest_regression(data, target_column, test_size=0.2, random_st
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     # Initialize the Random Forest Regression model
-    model = RandomForestRegressor(n_estimators=100, random_state=random_state)  # You can adjust hyperparameters as needed
+    model = RandomForestRegressor(n_estimators=100, random_state=random_state)
 
     # Train the model
     model.fit(X_train, y_train)
@@ -250,47 +294,3 @@ def train_random_forest_regression(data, target_column, test_size=0.2, random_st
         'Root Mean Squared Error': rmse,
         'R-squared': r2
     }
-
-# ------------------------------------------------random forest regression visualization------------------------------------------------
-
-def train_random_forest_regression(data, target_column, test_size=0.2, random_state=42):
-    """
-    Train a Random Forest Regression model on the given DataFrame.
-
-    Parameters:
-    - data (DataFrame): The DataFrame containing features and target variable.
-    - target_column (str): The name of the target variable column.
-    - test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
-    - random_state (int, optional): Random state for reproducibility. Default is 42.
-
-    Returns:
-    - fig: A matplotlib figure containing the scatter plot of actual vs. predicted values.
-    """
-
-    # Splitting the data into features (X) and target variable (y)
-    X = data.drop(columns=[target_column, 'Date'])
-    y = data[target_column]
-
-    # Splitting the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-
-    # Initialize the Random Forest Regression model
-    model = RandomForestRegressor(n_estimators=100, random_state=random_state)  # You can adjust hyperparameters as needed
-
-    # Train the model
-    model.fit(X_train, y_train)
-
-    # Make predictions on the test set
-    predictions = model.predict(X_test)
-
-    # Visualize the actual vs. predicted values
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.scatter(y_test, predictions, color='blue', alpha=0.5)
-    ax.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
-    ax.set_xlabel('Actual Values')
-    ax.set_ylabel('Predicted Values')
-    ax.set_title('Actual vs. Predicted Values')
-    ax.grid(True)
-
-    # Return the figure
-    return fig
