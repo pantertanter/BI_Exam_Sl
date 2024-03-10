@@ -129,43 +129,6 @@ st.write(cleaned_data.sample(n=6))
 # Indicate the number of columns remaining
 st.write("The data frame now has 6 columns left.")
 
-#---------------------------------------------Elbow method-----------------------------------------------
-
-st.write('**The elbow method is a approximation method used in clustering analysis to determine the optimal number of clusters by identifying the point where the rate of decrease in within-cluster variance slows, resembling an "elbow" shape in the plot.**')
-
-# Calculate WCSS for different numbers of clusters
-wcss = calculate_wcss(data, max_clusters=10)
-
-# Display elbow plot
-fig_elbow = plot_elbow(wcss, max_clusters=10)
-st.pyplot(fig_elbow)
-
-# ------------------------------------------------Silhouette Score------------------------------------------
-
-st.write('**The silhouette score is a metric used to evaluate the quality of clustering by measuring the cohesion and separation of clusters, with higher scores indicating better-defined clusters.**')
-
-# Display silhouette scores in Streamlit app
-def display_silhouette_scores():
-    st.write("Calculating silhouette scores...")
-    silhouette_scores = calculate_silhouette_scores(data, max_clusters=10)
-    st.write("Silhouette Scores:")
-    for n_clusters, score in enumerate(silhouette_scores, start=2):
-        st.write(f"Number of clusters: {n_clusters}, Silhouette score: {score:.4f}")
-
-# Center-align the button
-col1, col2, col3 = st.columns([1, 4, 1])
-with col2:
-    if st.button("Calculate Silhouette Scores range 2-10 clusters"):
-        display_silhouette_scores()
-
-# ------------------------------------------------Clustering------------------------------------------
-
-st.write('**The numeric features are scaled using StandardScaler to ensure that each feature contributes equally to the clustering process. Dimensionality reduction is performed using Principal Component Analysis (PCA) with n_components=2, transforming the scaled data into a 2-dimensional space. K-means clustering is applied to the reduced data with the specified number of clusters (num_clusters), utilizing the KMeans algorithm. The clusters are predicted for each data point. Finally, a scatter plot is created to visualize the clusters in the reduced 2-dimensional space, where each point represents a data point and is colored according to its assigned cluster.**')
-
-# Apply K-Means clustering and visualize clusters
-fig = apply_kmeans_clustering(data, sample_size=1000, num_clusters=2, random_state=42)
-st.pyplot(fig)
-
 # ------------------------------------------------train gradient boosting regression----------------------------------------
 
 st.title('Training Gradient Boosting And Random Forrest Regression Models')
@@ -239,4 +202,50 @@ st.write("**The evaluation metrics help us understand how well the predictive mo
 st.write("**Understanding we are dealing with significant figures for Wallmart Store sales for whole weeks this is an excellent result. Especially considering that the R-squared is so close to 1, making it a near perfect prediction.**")
 
 st.write('**Looking back over these two model, which performs very well by the looks of them and by looking at their metrics. The best performing model is fairly easy to spot and must be the random forrest regression prediction model and we would choose this if we only wanted to move forward with one model**')
-# ------------------------------------------------End of the app----------------------------------------
+
+st.write('**------------------------------------------------------------End of the app----------------------------------------------------**')
+
+# # ------------------------------------------------End GIF------------------------------------------
+
+# # Embedding the GIF from Giphy
+# st.image("https://media.giphy.com/media/8gNQZ9IpkcdiAjfOgN/giphy.gif", width=480)
+
+# # Optional: Adding a link to the Giphy page
+# st.markdown('[via GIPHY](https://giphy.com/gifs/illustration-marketing-data-8gNQZ9IpkcdiAjfOgN)')
+
+# #---------------------------------------------Elbow method-----------------------------------------------
+
+# st.write('**The elbow method is a approximation method used in clustering analysis to determine the optimal number of clusters by identifying the point where the rate of decrease in within-cluster variance slows, resembling an "elbow" shape in the plot.**')
+
+# # Calculate WCSS for different numbers of clusters
+# wcss = calculate_wcss(data, max_clusters=10)
+
+# # Display elbow plot
+# fig_elbow = plot_elbow(wcss, max_clusters=10)
+# st.pyplot(fig_elbow)
+
+# # ------------------------------------------------Silhouette Score------------------------------------------
+
+# st.write('**The silhouette score is a metric used to evaluate the quality of clustering by measuring the cohesion and separation of clusters, with higher scores indicating better-defined clusters.**')
+
+# # Display silhouette scores in Streamlit app
+# def display_silhouette_scores():
+#     st.write("Calculating silhouette scores...")
+#     silhouette_scores = calculate_silhouette_scores(data, max_clusters=10)
+#     st.write("Silhouette Scores:")
+#     for n_clusters, score in enumerate(silhouette_scores, start=2):
+#         st.write(f"Number of clusters: {n_clusters}, Silhouette score: {score:.4f}")
+
+# # Center-align the button
+# col1, col2, col3 = st.columns([1, 4, 1])
+# with col2:
+#     if st.button("Calculate Silhouette Scores range 2-10 clusters"):
+#         display_silhouette_scores()
+
+# # ------------------------------------------------Clustering------------------------------------------
+
+# st.write('**The numeric features are scaled using StandardScaler to ensure that each feature contributes equally to the clustering process. Dimensionality reduction is performed using Principal Component Analysis (PCA) with n_components=2, transforming the scaled data into a 2-dimensional space. K-means clustering is applied to the reduced data with the specified number of clusters (num_clusters), utilizing the KMeans algorithm. The clusters are predicted for each data point. Finally, a scatter plot is created to visualize the clusters in the reduced 2-dimensional space, where each point represents a data point and is colored according to its assigned cluster.**')
+
+# # Apply K-Means clustering and visualize clusters
+# fig = apply_kmeans_clustering(data, sample_size=1000, num_clusters=2, random_state=42)
+# st.pyplot(fig)

@@ -142,65 +142,6 @@ def create_correlation_heatmap(data):
     # Return the heatmap plot
     return plt.gcf()
 
-
-
-# ------------------------------------------------Elbow Method------------------------------------------------
-
-# Define calculate_wcss and plot_elbow functions
-def calculate_wcss(data, max_clusters=10):
-    numeric_data = data.select_dtypes(include=['number'])
-    wcss = []
-    for i in range(1, max_clusters + 1):
-        kmeans = KMeans(n_clusters=i, random_state=42)
-        kmeans.fit(numeric_data)
-        wcss.append(kmeans.inertia_)
-    return wcss
-
-def plot_elbow(wcss, max_clusters=10):
-    fig, ax = plt.subplots()
-    ax.plot(range(1, max_clusters + 1), wcss, marker='o')
-    ax.set_title('Elbow Method')
-    ax.set_xlabel('Number of Clusters')
-    ax.set_ylabel('WCSS')
-    return fig
-
-# ------------------------------------------------Silhouette Score------------------------------------------
-
-# Define calculate_silhouette_scores function
-def calculate_silhouette_scores(data, max_clusters=10):
-    numeric_data = data.select_dtypes(include=['number'])
-    silhouette_scores = []
-    for n_clusters in range(2, max_clusters + 1):
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        cluster_labels = kmeans.fit_predict(numeric_data)
-        silhouette_avg = silhouette_score(numeric_data, cluster_labels)
-        silhouette_scores.append(silhouette_avg)
-    return silhouette_scores
-
-# ------------------------------------------------Clustering------------------------------------------------
-
-def apply_kmeans_clustering(data, num_clusters=2, sample_size=None, random_state=None):
-    if sample_size:
-        data = data.sample(n=sample_size, random_state=random_state)
-    
-    numeric_data = data.drop(columns=['Store', 'Date', 'Holiday_Flag'])
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(numeric_data)
-
-    pca = PCA(n_components=2)
-    reduced_data = pca.fit_transform(scaled_data)
-
-    kmeans = KMeans(n_clusters=num_clusters, random_state=random_state)
-    clusters = kmeans.fit_predict(reduced_data)
-
-    fig, ax = plt.subplots()
-    ax.scatter(reduced_data[:, 0], reduced_data[:, 1], c=clusters, cmap='viridis')
-    ax.set_xlabel('Principal Component 1')
-    ax.set_ylabel('Principal Component 2')
-    ax.set_title('K-Means Clustering')
-    
-    return fig
-
 # ------------------------------------------------random forest regression------------------------------------------------
 
 from sklearn.model_selection import train_test_split
@@ -342,3 +283,62 @@ def train_random_forest_regression_with_metrics(data, target_column, test_size=0
         'Root Mean Squared Error': rmse,
         'R-squared': r2
     }
+
+# ------------------------------------------------End of App------------------------------------------------
+
+# ------------------------------------------------Elbow Method------------------------------------------------
+
+# Define calculate_wcss and plot_elbow functions
+def calculate_wcss(data, max_clusters=10):
+    numeric_data = data.select_dtypes(include=['number'])
+    wcss = []
+    for i in range(1, max_clusters + 1):
+        kmeans = KMeans(n_clusters=i, random_state=42)
+        kmeans.fit(numeric_data)
+        wcss.append(kmeans.inertia_)
+    return wcss
+
+def plot_elbow(wcss, max_clusters=10):
+    fig, ax = plt.subplots()
+    ax.plot(range(1, max_clusters + 1), wcss, marker='o')
+    ax.set_title('Elbow Method')
+    ax.set_xlabel('Number of Clusters')
+    ax.set_ylabel('WCSS')
+    return fig
+
+# ------------------------------------------------Silhouette Score------------------------------------------
+
+# Define calculate_silhouette_scores function
+def calculate_silhouette_scores(data, max_clusters=10):
+    numeric_data = data.select_dtypes(include=['number'])
+    silhouette_scores = []
+    for n_clusters in range(2, max_clusters + 1):
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+        cluster_labels = kmeans.fit_predict(numeric_data)
+        silhouette_avg = silhouette_score(numeric_data, cluster_labels)
+        silhouette_scores.append(silhouette_avg)
+    return silhouette_scores
+
+# ------------------------------------------------Clustering------------------------------------------------
+
+def apply_kmeans_clustering(data, num_clusters=2, sample_size=None, random_state=None):
+    if sample_size:
+        data = data.sample(n=sample_size, random_state=random_state)
+    
+    numeric_data = data.drop(columns=['Store', 'Date', 'Holiday_Flag'])
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(numeric_data)
+
+    pca = PCA(n_components=2)
+    reduced_data = pca.fit_transform(scaled_data)
+
+    kmeans = KMeans(n_clusters=num_clusters, random_state=random_state)
+    clusters = kmeans.fit_predict(reduced_data)
+
+    fig, ax = plt.subplots()
+    ax.scatter(reduced_data[:, 0], reduced_data[:, 1], c=clusters, cmap='viridis')
+    ax.set_xlabel('Principal Component 1')
+    ax.set_ylabel('Principal Component 2')
+    ax.set_title('K-Means Clustering')
+    
+    return fig

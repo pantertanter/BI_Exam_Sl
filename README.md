@@ -41,7 +41,7 @@ The development workflow is divided into four sprints and milestones, each with 
 **Objective:** Implement AI methods and algorithms for predictive modeling.
 
 1. Select relevant methods and algorithms for solving the problem.
-- We wanted to look further into clustering as we find this very interessting. It is especially interessting how feature values cluster together.
+-  Our data exhibits non-linear relationships between input features and the target variable, Random Forest Regression can capture these complex relationships effectively. Unlike linear regression, Random Forest Regression can model non-linear patterns without the need for feature engineering.
 2. Train predictive or generative data models using supervised and unsupervised methods, neural networks, LLMs, or graphs.
 - We have implemented and trained gradient boosting regression and random forrest regression method and showed a models which perform very well in predicting the weekly sales.
 3. Apply appropriate inference measures to assess model quality and test hypotheses.
