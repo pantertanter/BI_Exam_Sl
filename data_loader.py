@@ -57,32 +57,21 @@ def clean_out_features(data, features):
     data_cleaned = data.drop(existing_features, axis=1)
     return data_cleaned
 
-# ------------------------------------------------Normality test------------------------------------------------
+# ------------------------------------------------Creating an interactive box plot------------------------------------------------
 
-def normal_test(data):
-    if data.empty:
-        return ["DataFrame is empty. Unable to perform normality test."]
+def create_box_plot(data):
+    # Generate a unique key for the selectbox
+    selectbox_key = "select_column_box_plot"
     
-    # Convert columns to numeric type
-    numeric_data = data.apply(pd.to_numeric, errors='coerce')
-    numeric_columns = numeric_data.columns
+    # Create a dropdown menu for column selection
+    selected_column = st.selectbox("Select a column:", data.columns, key=selectbox_key)
     
-    if numeric_columns.empty:
-        return ["No numeric columns found in the DataFrame. Unable to perform normality test."]
-    
-    # Check for normal distribution using the Anderson-Darling test
-    alpha = 0.05
-    results = []
-    for column in numeric_columns:
-        result = anderson(numeric_data[column].dropna())
-        statistic = result.statistic
-        critical_values = result.critical_values
-        p_value = result.significance_level[0]  # Extracting the p-value
-        if all(statistic < critical_values):
-            results.append(f"Data in column '{column}' is normally distributed (p = {p_value:.4f})")
-        else:
-            results.append(f"Data in column '{column}' is not normally distributed (p = {p_value:.4f})")
-    return results
+    # Create the box plot based on the selected column
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.boxplot(data[selected_column])
+    ax.set_title(f'Box Plot of {selected_column}')
+    ax.set_ylabel(selected_column)
+    return fig
 
 # ------------------------------------------------Visualizing the normal distribution interactive------------------------------------------------
 
@@ -113,21 +102,32 @@ def plot_normal_distribution(data, column_name):
     # Display the figure in Streamlit
     st.pyplot(fig)
 
-# ------------------------------------------------Creating an interactive box plot------------------------------------------------
+# ------------------------------------------------Normality test------------------------------------------------
 
-def create_box_plot(data):
-    # Generate a unique key for the selectbox
-    selectbox_key = "select_column_box_plot"
+def normal_test(data):
+    if data.empty:
+        return ["DataFrame is empty. Unable to perform normality test."]
     
-    # Create a dropdown menu for column selection
-    selected_column = st.selectbox("Select a column:", data.columns, key=selectbox_key)
+    # Convert columns to numeric type
+    numeric_data = data.apply(pd.to_numeric, errors='coerce')
+    numeric_columns = numeric_data.columns
     
-    # Create the box plot based on the selected column
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.boxplot(data[selected_column])
-    ax.set_title(f'Box Plot of {selected_column}')
-    ax.set_ylabel(selected_column)
-    return fig
+    if numeric_columns.empty:
+        return ["No numeric columns found in the DataFrame. Unable to perform normality test."]
+    
+    # Check for normal distribution using the Anderson-Darling test
+    alpha = 0.05
+    results = []
+    for column in numeric_columns:
+        result = anderson(numeric_data[column].dropna())
+        statistic = result.statistic
+        critical_values = result.critical_values
+        p_value = result.significance_level[0]  # Extracting the p-value
+        if all(statistic < critical_values):
+            results.append(f"Data in column '{column}' is normally distributed (p = {p_value:.4f})")
+        else:
+            results.append(f"Data in column '{column}' is not normally distributed (p = {p_value:.4f})")
+    return results
 
 # ------------------------------------------------Correlation Heatmap------------------------------------------------
     
@@ -141,54 +141,6 @@ def create_correlation_heatmap(data):
 
     # Return the heatmap plot
     return plt.gcf()
-
-# ------------------------------------------------random forest regression------------------------------------------------
-
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-
-def visualize_random_forest_regression(data, target_column, test_size=0.2, random_state=42):
-    """
-    Train a Random Forest Regression model on the given DataFrame and visualize the actual vs. predicted values.
-
-    Parameters:
-    - data (DataFrame): The DataFrame containing features and target variable.
-    - target_column (str): The name of the target variable column.
-    - test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
-    - random_state (int, optional): Random state for reproducibility. Default is 42.
-
-    Returns:
-    - fig: A matplotlib figure containing the scatter plot of actual vs. predicted values.
-    """
-
-    # Splitting the data into features (X) and target variable (y)
-    X = data.drop(columns=[target_column, 'Date'])
-    y = data[target_column]
-
-    # Splitting the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-
-    # Initialize the Random Forest Regression model
-    model = RandomForestRegressor(n_estimators=100, random_state=random_state)
-
-    # Train the model
-    model.fit(X_train, y_train)
-
-    # Make predictions on the test set
-    predictions = model.predict(X_test)
-
-    # Visualize the actual vs. predicted values
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.scatter(y_test, predictions, color='blue', alpha=0.5)
-    ax.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
-    ax.set_xlabel('Actual Values')
-    ax.set_ylabel('Predicted Values')
-    ax.set_title('Actual vs. Predicted Values')
-    ax.grid(True)
-
-    # Return the figure
-    return fig
 
 # ------------------------------------------------gradient boosting regression------------------------------------------------
 
@@ -238,6 +190,54 @@ def train_gradient_boosting_regression(data, target_column, test_size=0.2, rando
         'R-squared': r2
     }, y_test, predictions
 
+# ------------------------------------------------random forest regression------------------------------------------------
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+def visualize_random_forest_regression(data, target_column, test_size=0.2, random_state=42, n_estimators=100):
+    """
+    Train a Random Forest Regression model on the given DataFrame and visualize the actual vs. predicted values.
+
+    Parameters:
+    - data (DataFrame): The DataFrame containing features and target variable.
+    - target_column (str): The name of the target variable column.
+    - test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
+    - random_state (int, optional): Random state for reproducibility. Default is 42.
+
+    Returns:
+    - fig: A matplotlib figure containing the scatter plot of actual vs. predicted values.
+    """
+
+    # Splitting the data into features (X) and target variable (y)
+    X = data.drop(columns=[target_column, 'Date'])
+    y = data[target_column]
+
+    # Splitting the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    # Initialize the Random Forest Regression model
+    model = RandomForestRegressor(n_estimators=100, random_state=random_state)
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Make predictions on the test set
+    predictions = model.predict(X_test)
+
+    # Visualize the actual vs. predicted values
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.scatter(y_test, predictions, color='blue', alpha=0.5)
+    ax.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
+    ax.set_xlabel('Actual Values')
+    ax.set_ylabel('Predicted Values')
+    ax.set_title('Actual vs. Predicted Values')
+    ax.grid(True)
+
+    # Return the figure
+    return fig
+
 # ------------------------------------------------Random forest regression----------------------------------------
 
 def train_random_forest_regression_with_metrics(data, target_column, test_size=0.2, random_state=42):
@@ -283,6 +283,121 @@ def train_random_forest_regression_with_metrics(data, target_column, test_size=0
         'Root Mean Squared Error': rmse,
         'R-squared': r2
     }
+
+# ------------------------------------------------Feature Importance------------------------------------------------
+
+def retrieve_feature_importance(data, target_column='Weekly_Sales', test_size=0.2, random_state=42):
+    """
+    Retrieve feature importance scores from a trained Random Forest model.
+
+    Parameters:
+    - model: Trained Random Forest model.
+
+    Returns:
+    - feature_importance: List of feature importance scores.
+    """
+    # Splitting the data into features (X) and target variable (y)
+    X = data.drop(columns=[target_column, 'Date'])
+    y = data[target_column]
+
+    # Splitting the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    # Initialize the Random Forest Regression model
+    model = RandomForestRegressor(n_estimators=100, random_state=random_state)
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    return model.feature_importances_
+
+# ------------------------------------------------Display Feature Importance----------------------------------------
+
+def display_feature_importance(data, target_column='Weekly_Sales', test_size=0.2, random_state=42):
+    """
+    Display feature importance scores from a trained Random Forest model.
+
+    Parameters:
+    - data_path (str): Path to the dataset.
+    - target_column (str): Name of the target column. Default is 'Weekly_Sales'.
+    - test_size (float): Proportion of the dataset to include in the test split. Default is 0.2.
+    - random_state (int): Random state for reproducibility. Default is 42.
+    """
+
+    # Train-test split
+    X = data.drop(columns=[target_column, 'Date'])
+    y = data[target_column]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    # Train a Random Forest model
+    model = RandomForestRegressor(n_estimators=100, random_state=random_state)
+    model.fit(X_train, y_train)
+
+    # Retrieve feature importance scores
+    feature_importance_scores = retrieve_feature_importance(data)
+
+    # Create a DataFrame with feature names and importance scores
+    feature_importance_df = pd.DataFrame({'Feature': X.columns, 'Importance Score': feature_importance_scores})
+
+    # Transpose the DataFrame so that feature names become columns
+    feature_importance_df = feature_importance_df.set_index('Feature').transpose()
+
+    # Display the DataFrame
+    st.write("Feature Importance Scores:")
+    st.write(feature_importance_df)
+
+# ------------------------------------------------Visualizing Feature Importance----------------------------------------
+
+def visualize_feature_importance(feature_importance, feature_names, plot_type='bar', figsize=(10, 6), palette='viridis'):
+    """
+    Visualize feature importance scores using specified plotting technique.
+
+    Parameters:
+    - feature_importance: List of feature importance scores.
+    - feature_names: List of feature names.
+    - plot_type: Type of plot to use ('bar', 'barh', or 'heatmap'). Default is 'bar'.
+    - figsize: Figure size for the plot. Default is (10, 6).
+    - palette: Color palette for the plot. Default is 'viridis'.
+
+    Returns:
+    - fig: Matplotlib figure object.
+    """
+    # Ensure feature_names and feature_importance have the same length
+    if len(feature_names) != len(feature_importance):
+        raise ValueError("Length mismatch: feature_names and feature_importance must have the same length.")
+    print("Length of feature_names:", len(feature_names))
+    print("Length of feature_importance:", len(feature_importance))
+
+    # Create a DataFrame for easier manipulation
+    importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': feature_importance})
+    
+    # Sort features by importance score
+    importance_df = importance_df.sort_values(by='Importance', ascending=False)
+    
+    # Plot feature importance
+    fig, ax = plt.subplots(figsize=figsize)
+    if plot_type == 'bar':
+        sns.barplot(x='Importance', y='Feature', data=importance_df, palette=palette, ax=ax)
+        ax.set_xlabel('Feature Importance Score')
+        ax.set_ylabel('Feature')
+        ax.set_title('Feature Importance')
+    elif plot_type == 'barh':
+        sns.barplot(x='Feature', y='Importance', data=importance_df, palette=palette, ax=ax)
+        ax.set_xlabel('Feature')
+        ax.set_ylabel('Feature Importance Score')
+        ax.set_title('Feature Importance')
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+    elif plot_type == 'heatmap':
+        importance_matrix = importance_df.pivot_table(index=None, columns='Feature', values='Importance')
+        sns.heatmap(importance_matrix, cmap=palette, ax=ax)
+        ax.set_xlabel('Feature')
+        ax.set_ylabel('Importance Score')
+        ax.set_title('Feature Importance Heatmap')
+    else:
+        raise ValueError("Invalid plot_type. Choose from 'bar', 'barh', or 'heatmap'.")
+    
+    plt.tight_layout()
+    return fig
 
 # ------------------------------------------------End of App------------------------------------------------
 

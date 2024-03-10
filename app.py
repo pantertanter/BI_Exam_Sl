@@ -5,11 +5,13 @@ from data_loader import (read_csv, normal_test, clean_data,
                         apply_kmeans_clustering, calculate_wcss,
                         plot_elbow, calculate_silhouette_scores,
                         train_random_forest_regression_with_metrics, visualize_random_forest_regression,
-                        train_gradient_boosting_regression)
+                        train_gradient_boosting_regression, retrieve_feature_importance,
+                        visualize_feature_importance, display_feature_importance)
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
 
 #------------------------------------------------Loading the data------------------------------------------------
 
@@ -55,27 +57,25 @@ data_descriptive = data.describe()
 st.write('**Descriptive statistics:**')
 st.write(data_descriptive)
 
-# ------------------------------------------------Normality test------------------------------------------------
+# ------------------------------------------------Box plot------------------------------------------------
 
-# Perform the normality test
-st.write('**Normality test using the Anderson-Darling test:**')
-normal_test_result = normal_test(data)
-
-# Display the result
-for result in normal_test_result:
-    st.write(result)
-
-st.write('**The normality test suggests that non of the columns is normally distributed.**')
-st.write('**We personally do not trust this so we will make a visual representation of the normal distribution.**')
-st.write('**We will visualize the normal distribution of the columns to confirm the result.**')
+st.markdown('---')
+st.markdown('## Box Plot of columns')
+st.markdown('**The box plot below shows the distribution of the colums\' values.**')
+box_plot_fig = create_box_plot(data)
+st.pyplot(box_plot_fig)
+st.markdown('---')
 
 # ---------------------------Visualizing the normal distribution interactive-----------------------------------
 
 # Optional column selection 
 st.title("Normal Distribution Visualization")
 
+# Optional: Filter out the "Date" column
+data_without_col_for_nor = data.drop(columns=["Date", 'Holiday_Flag', 'Store'])
+
 # Selectbox for choosing the column
-selected_column = st.selectbox("Select a column:", data.columns)
+selected_column = st.selectbox("Select a column:", data_without_col_for_nor.columns)
 
 # Plot the normal distribution if a column is selected
 if selected_column:
@@ -83,17 +83,21 @@ if selected_column:
     plot_normal_distribution(data, selected_column)
 
 st.markdown('---')
-st.markdown('## Box Plot of columns without outliers')
-st.markdown('**The box plot below shows the distribution of the colums without outliers.**')
-box_plot_fig = create_box_plot(data)
-st.pyplot(box_plot_fig)
+
+# ------------------------------------------------Normality test------------------------------------------------
+
+# Button to perform the normality test
+if st.button("Perform Normality Test"):
+    with st.spinner("Performing normality test..."):
+        # Perform normality test
+        results = normal_test(data_without_col_for_nor)
+            
+        # Display results in an expandable section
+        with st.expander("Normality Test Results", expanded=True):
+            for result in results:
+                st.write(result)
+
 st.markdown('---')
-
-# ------------------------------------------Creating a heatmap  -------------------------------------------
-
-st.markdown('## Correlation Heatmap With All Features')
-correlation_heatmap_fig = create_correlation_heatmap(data)
-st.pyplot(correlation_heatmap_fig)
 
 #------------------------------------------------Cleaning out features------------------------------------
 
@@ -105,6 +109,10 @@ cleaned_data = clean_out_features(data, features_to_remove)
 
 st.markdown('## Correlation Heatmap With Cleaned Out Features')
 st.write('**The heatmap below shows the correlation between the features in the cleaned data.**')
+
+correlation_heatmap_fig_cleaned = create_correlation_heatmap(cleaned_data)
+st.pyplot(correlation_heatmap_fig_cleaned)
+
 st.write('**The correlation coefficient ranges from -1 to 1.**')
 st.write('**If the value is close to 1, it means that the features have a strong positive correlation.**')  
 st.write('**If the value is close to -1, it means that the features have a strong negative correlation.**')
@@ -113,21 +121,8 @@ st.write('**The heatmap helps us understand the relationship between the feature
 st.write('**This can help us identify which features are important for predicting Weekly Sales.**')
 st.write('**We removed the features which has the least impact on Weekly Sales and decided not to inspect them further for now.**')
 st.write('**As a result, the data is now represented by the following sample with 6 rows.**')
-correlation_heatmap_fig_cleaned = create_correlation_heatmap(cleaned_data)
-st.pyplot(correlation_heatmap_fig_cleaned)
 
-#------------------------------------------------Sample plus row select-----------------------------------
-
-# Explain the data preprocessing steps
-
-
-st.markdown('## Sample of the Cleaned Data')
-
-# Display the sample data frame
-st.write(cleaned_data.sample(n=6))
-
-# Indicate the number of columns remaining
-st.write("The data frame now has 6 columns left.")
+st.markdown('---')
 
 # ------------------------------------------------train gradient boosting regression----------------------------------------
 
@@ -136,7 +131,7 @@ st.title('Training Gradient Boosting And Random Forrest Regression Models')
 # Train the model and get evaluation metrics, actual values, and predicted values
 evaluation_metrics, actual_values, predicted_values = train_gradient_boosting_regression(data, target_column='Weekly_Sales')
 
-st.write('**The gradient boosting regression model has been trained and evaluated.**')
+st.write('**The gradient boosting regression model has been trained and evaluated.**') # Evaluated?
 
 # Plot the actual vs. predicted values
 fig, ax = plt.subplots(figsize=(8, 6))
@@ -165,6 +160,9 @@ for metric, value in evaluation_metrics.items():
     elif metric == "R-squared":
         st.write(f"{metric}: {value:.4f}")
         st.write("**The R-squared value (R^2) is a measure of how well the model explains the variance in the target variable. It ranges from 0 to 1, with higher values indicating a better fit.**")
+
+st.markdown('---')
+
         
 # ---------------------------Random forest regression and visualize actual vs predicted-----------------------------
     
@@ -173,14 +171,12 @@ st.write("**This scatter plot compares what the model predicted with what actual
 st.write("**Model Evaluation: It helps us evaluate the performance of the predictive model. If the points on the plot are close to the diagonal line, it indicates that the model's predictions are accurate. If they are scattered far from the line, it suggests that the model needs improvement.**")
 
 # Train the Random Forest Regression model
-fig = visualize_random_forest_regression(data, target_column='Weekly_Sales')
+fig = visualize_random_forest_regression(data, target_column='Weekly_Sales', n_estimators=200)
 
 # Display the figure in Streamlit
 st.pyplot(fig)
 
 # ------------------------------------------------Random forest regression----------------------------------------
-
-
 
 evaluation_metrics = train_random_forest_regression_with_metrics(data, target_column='Weekly_Sales')
 st.write("Evaluation Metrics:")
@@ -203,7 +199,23 @@ st.write("**Understanding we are dealing with significant figures for Wallmart S
 
 st.write('**Looking back over these two model, which performs very well by the looks of them and by looking at their metrics. The best performing model is fairly easy to spot and must be the random forrest regression prediction model and we would choose this if we only wanted to move forward with one model**')
 
-st.write('**------------------------------------------------------------End of the app----------------------------------------------------**')
+st.markdown('---')
+
+# ------------------------------------------------Feature importance----------------------------------------
+
+st.title('Feature Importance')
+
+# Display feature importance scores
+display_feature_importance(data)
+
+# Retrieve feature importance scores
+feature_importance_scores = retrieve_feature_importance(data)
+
+data_same_len = data.drop(columns=['Weekly_Sales', 'Date'])
+
+# Visualize feature importance
+fig = visualize_feature_importance(feature_importance_scores, data_same_len.columns)
+st.pyplot(fig)
 
 # # ------------------------------------------------End GIF------------------------------------------
 
