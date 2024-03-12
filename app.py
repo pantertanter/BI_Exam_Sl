@@ -128,8 +128,19 @@ st.markdown('---')
 
 st.title('Training Gradient Boosting And Random Forrest Regression Models')
 
+data_for_drop_column_gradient = data.drop(columns=['Date', 'Weekly_Sales'])
+
+drop_column_gradient = ''  # Define the variable outside the conditional block
+
+# Checkbox to enable/disable filtering
+enable_filtering_gradient = st.checkbox("Enable Filtering", key="enable_filtering_gradient")
+
+if enable_filtering_gradient:
+    # Selectbox for choosing the column
+    drop_column_gradient = st.selectbox("Select a column to filter:", data_for_drop_column_gradient.columns , key="drop_column_gradient")
+
 # Train the model and get evaluation metrics, actual values, and predicted values
-evaluation_metrics, actual_values, predicted_values = train_gradient_boosting_regression(data, target_column='Weekly_Sales')
+evaluation_metrics, actual_values, predicted_values = train_gradient_boosting_regression(data, drop_column_gradient, target_column='Weekly_Sales')
 
 st.write('**The gradient boosting regression model has been trained and evaluated.**') # Evaluated?
 
@@ -170,8 +181,19 @@ st.write("**This scatter plot compares what the model predicted with what actual
 
 st.write("**Model Evaluation: It helps us evaluate the performance of the predictive model. If the points on the plot are close to the diagonal line, it indicates that the model's predictions are accurate. If they are scattered far from the line, it suggests that the model needs improvement.**")
 
+data_for_drop_column_forrest = data.drop(columns=['Date', 'Weekly_Sales'])
+
+# Checkbox to enable/disable filtering
+drop_column_forrest = ''  # Define the variable outside the conditional block
+
+enable_filtering_forrest = st.checkbox("Enable Filtering", key="enable_filtering_forrest")
+
+if enable_filtering_forrest:
+    # Selectbox for choosing the column
+    drop_column_forrest = st.selectbox("Select a column to filter:", data_for_drop_column_forrest.columns , key="drop_column_forrest")
+
 # Train the Random Forest Regression model
-fig = visualize_random_forest_regression(data, target_column='Weekly_Sales', n_estimators=200)
+fig = visualize_random_forest_regression(data, drop_column_forrest, target_column='Weekly_Sales', n_estimators=200)
 
 # Display the figure in Streamlit
 st.pyplot(fig)

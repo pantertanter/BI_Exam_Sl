@@ -144,7 +144,7 @@ def create_correlation_heatmap(data):
 
 # ------------------------------------------------gradient boosting regression------------------------------------------------
 
-def train_gradient_boosting_regression(data, target_column, test_size=0.2, random_state=42):
+def train_gradient_boosting_regression(data, drop_column, target_column, test_size=0.2, random_state=42):
     """
     Train a Gradient Boosting Regression model on the given DataFrame and return evaluation metrics.
 
@@ -160,8 +160,15 @@ def train_gradient_boosting_regression(data, target_column, test_size=0.2, rando
     - np.array: Array of predicted values
     """
 
-    # Splitting the data into features (X) and target variable (y)
-    X = data.drop(columns=[target_column, 'Date'])
+    # Initialize the list of columns to drop with the target_column and 'Date'
+    columns_to_drop = [target_column, 'Date']
+
+    # Check if drop_column is not empty string
+    if drop_column:
+        columns_to_drop.append(drop_column)
+
+    # Drop specified columns from the DataFrame
+    X = data.drop(columns=columns_to_drop)
     y = data[target_column]
 
     # Splitting the data into training and testing sets
@@ -196,7 +203,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-def visualize_random_forest_regression(data, target_column, test_size=0.2, random_state=42, n_estimators=100):
+def visualize_random_forest_regression(data, drop_column, target_column, test_size=0.2, random_state=42, n_estimators=100):
     """
     Train a Random Forest Regression model on the given DataFrame and visualize the actual vs. predicted values.
 
@@ -210,8 +217,15 @@ def visualize_random_forest_regression(data, target_column, test_size=0.2, rando
     - fig: A matplotlib figure containing the scatter plot of actual vs. predicted values.
     """
 
+    # Initialize the list of columns to drop with the target_column and 'Date'
+    columns_to_drop = [target_column, 'Date']
+
+    # Check if drop_column is not empty string
+    if drop_column:
+        columns_to_drop.append(drop_column)
+
     # Splitting the data into features (X) and target variable (y)
-    X = data.drop(columns=[target_column, 'Date'])
+    X = data.drop(columns=columns_to_drop)
     y = data[target_column]
 
     # Splitting the data into training and testing sets
