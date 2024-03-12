@@ -56,10 +56,13 @@ The development workflow is divided into four sprints and milestones, each with 
 **Objective:** Present analysis results in a human-understandable form.
 
 1. Visualize data, analysis process, methods, and usage scenarios.
+- We have multiple diagrams with different functions and metrics showing more parts of the data.
 2. Create a simple visual interface for the application.
+- The application is made in Streamlit.
 3. Conduct usability evaluation with potential users and incorporate feedback.
+- No, we did not get to do this part.
 4. Revise, complete, and deliver the final solution to Github and Wiseflow.
-
+- Yes.
 **Recommended Deadline:** 14/03/24
 
 ## Notes
