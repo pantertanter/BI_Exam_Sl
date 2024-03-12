@@ -62,7 +62,10 @@ st.write(data_descriptive)
 st.markdown('---')
 st.markdown('## Box Plot of columns')
 st.markdown('**The box plot below shows the distribution of the colums\' values.**')
-box_plot_fig = create_box_plot(data)
+
+data_without_col_for_nor = data.drop(columns=["Date", 'Holiday_Flag', 'Store'])
+
+box_plot_fig = create_box_plot(data_without_col_for_nor)
 st.pyplot(box_plot_fig)
 st.markdown('---')
 
@@ -70,9 +73,6 @@ st.markdown('---')
 
 # Optional column selection 
 st.title("Normal Distribution Visualization")
-
-# Optional: Filter out the "Date" column
-data_without_col_for_nor = data.drop(columns=["Date", 'Holiday_Flag', 'Store'])
 
 # Selectbox for choosing the column
 selected_column = st.selectbox("Select a column:", data_without_col_for_nor.columns)
@@ -205,9 +205,6 @@ st.markdown('---')
 
 st.title('Feature Importance')
 
-# Display feature importance scores
-display_feature_importance(data)
-
 # Retrieve feature importance scores
 feature_importance_scores = retrieve_feature_importance(data)
 
@@ -216,6 +213,9 @@ data_same_len = data.drop(columns=['Weekly_Sales', 'Date'])
 # Visualize feature importance
 fig = visualize_feature_importance(feature_importance_scores, data_same_len.columns)
 st.pyplot(fig)
+
+# Display feature importance scores
+display_feature_importance(data)
 
 # # ------------------------------------------------End GIF------------------------------------------
 
